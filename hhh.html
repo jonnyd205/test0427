@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .slider-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px; /* 반응형 처리 */
+            margin: auto;
+        }
+
+        .slides {
+            display: flex;
+            list-style-type: none;
+            padding-left: 0;
+            overflow-x: hidden;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .slides li {
+            min-width: 100%; /* 한 슬라이드는 전체 너비를 차지하도록 설정 */
+        }
+
+        .slides img {
+            width: 100%;
+            display: block;
+        }
+
+        #prevBtn, #nextBtn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(255, 255, 255, 0.8);
+            border: none;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        #prevBtn {
+            left: -30px; /* 버튼 위치 조정 */
+        }
+
+        #nextBtn {
+            right: -30px;
+        }
+
+        .pagination {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .pagination .dot {
+            background-color: #ccc;
+            border-radius: 50%;
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            margin: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="slider-container">
+        <!-- 이전과 다음 버튼 -->
+        <button id="prevBtn">＜</button>
+
+        <!-- 슬라이드 컨테이너 -->
+        <ul class="slides">
+            <li><img src="image1.jpg" alt="슬라이드 1"></li>
+            <li><img src="image2.jpg" alt="슬라이드 2"></li>
+            <li><img src="image3.jpg" alt="슬라이드 3"></li>
+        </ul>
+
+        <!-- 이전과 다음 버튼 -->
+        <button id="nextBtn">＞</button>
+
+        <!-- 페이지 네이션 -->
+        <div class="pagination">
+            <!-- 자동 생성될 페이지 네이션 -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const slides = document.querySelector('.slides');
+            const nextBtn = document.getElementById('nextBtn');
+            const prevBtn = document.getElementById('prevBtn');
+            const paginationContainer = document.querySelector('.pagination');
+
+            // 슬라이드 아이템 배열을 가져옵니다.
+            let slideItems = Array.from(slides.children);
+            
+            // 페이지 네이션 버튼 생성
+            function createPaginationDots() {
+                for (let i = 0; i < slideItems.length; i++) {
+                    const dot = document.createElement('span');
+                    dot.classList.add('dot');
+                    paginationContainer.appendChild(dot);
+
+                    if (i === 0) dot.classList.add('active'); // 첫 번째 점 활성화
+                }
+            }
+
+            createPaginationDots();
+
+            let currentIndex = 0;
+            const slideCount = slideItems.length;
+
+            function updateSlider() {
+                slides.style.transform = `translateX(-${currentIndex * 100}%)`;
+                paginationContainer.querySelector('.active').classList.remove('active');
+                paginationContainer.children[currentIndex].classList.add('active');
+
+                // 무한 슬라이드 처리
+                if (currentIndex === slideCount) currentIndex = 0;
+                else if (currentIndex < 0) currentIndex = slideCount - 1;
+            }
+
+            function nextSlide() {
+                currentIndex++;
+                updateSlider();
+            }
+
+            function prevSlide() {
+                currentIndex--;
+                updateSlider();
+            }
+
+            // 버튼 클릭 이벤트 핸들러
+            paginationContainer.addEventListener('click', e => {
+                if (e.target.tagName === 'SPAN') {
+                    const index = Array.from(paginationContainer.children).indexOf(e.target);
+                    currentIndex = index;
+                    updateSlider();
+                }
+            });
+
+            nextBtn.addEventListener('click', nextSlide);
+            prevBtn.addEventListener('click', prevSlide);
+
+            // 초기화
+            updateSlider();
+
+            setInterval(nextSlide, 3000); // 자동 슬라이드 (3초마다 다음 슬라이드로 이동)
+        });
+    </script>
+</body>
+</html>
