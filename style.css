@@ -1,0 +1,232 @@
+<!-- 기본 스타일 -->
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* 네비게이션 바 */
+nav {
+    background-color: #333;
+    color: white;
+    position: relative;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-menu li {
+    position: relative;
+}
+
+.nav-menu a {
+    display: block;
+    padding: 15px 20px;
+    color: white;
+    text-decoration: none;
+}
+
+.nav-menu a:hover {
+    background-color: #555;
+}
+
+/* 서브메뉴 */
+.submenu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100vw;
+    background-color: rgba(0, 0, 0, 0.9);
+    z-index: 1000;
+    padding: 20px 0;
+}
+
+.submenu-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-around;
+}
+
+.submenu-column {
+    flex: 1;
+    padding: 0 20px;
+}
+
+.submenu-column h3 {
+    margin: 0 0 10px 0;
+    color: white;
+}
+
+.submenu-column ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.submenu-column ul li {
+    margin-bottom: 5px;
+}
+
+.submenu-column ul li a {
+    color: #ccc;
+    text-decoration: none;
+}
+
+.submenu-column ul li a:hover {
+    color: white;
+}
+
+/* 호버 시 서브메뉴 표시 */
+nav:hover .submenu {
+    display: block;
+}
+
+/* 햄버거 메뉴 (모바일) */
+.hamburger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.hamburger span {
+    width: 25px;
+    height: 3px;
+    background-color: white;
+    margin: 3px 0;
+    transition: 0.3s;
+}
+/* 모바일 스타일 */
+@media (max-width: 768px) {
+    .nav-menu {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background-color: #333;
+    }
+
+    .nav-menu.active {
+        display: flex;
+    }
+
+    .hamburger {
+        display: flex;
+    }
+
+    .submenu {
+        position: static;
+        width: 100%;
+        background-color: #444;
+        display: none;
+    }
+
+    .submenu.active {
+        display: block;
+    }
+
+    .submenu-container {
+        flex-direction: column;
+    }
+
+    .submenu-column {
+        padding: 10px 20px;
+    }
+}
+// script.js
+
+// 햄버거 메뉴 토글
+const hamburger = document.getElementById('hamburger');
+const navMenu = document.querySelector('.nav-menu');
+const submenu = document.querySelector('.submenu');
+
+hamburger.addEventListener('click', () => {
+    navMenu.classList.toggle('active');
+    submenu.classList.toggle('active');
+});
+
+// GSAP 애니메이션 (데스크톱 호버)
+document.addEventListener('DOMContentLoaded', () => {
+    const submenuTl = gsap.timeline({ paused: true });
+    submenuTl.fromTo(submenu, { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" });
+
+    nav.addEventListener('mouseenter', () => {
+        submenu.style.display = 'block';
+        submenuTl.play();
+    });
+
+    nav.addEventListener('mouseleave', () => {
+        submenuTl.reverse().then(() => {
+            submenu.style.display = 'none';
+        });
+    });
+});// script.js
+
+// 햄버거 메뉴 토글
+const hamburger = document.getElementById('hamburger');
+const navMenu = document.querySelector('.nav-menu');
+const submenu = document.querySelector('.submenu');
+
+hamburger.addEventListener('click', () => {
+    navMenu.classList.toggle('active');
+    submenu.classList.toggle('active');
+});
+
+// GSAP 애니메이션 (데스크톱 호버)
+document.addEventListener('DOMContentLoaded', () => {
+    const submenuTl = gsap.timeline({ paused: true });
+    submenuTl.fromTo(submenu, { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" });
+
+    nav.addEventListener('mouseenter', () => {
+        submenu.style.display = 'block';
+        submenuTl.play();
+    });
+
+    nav.addEventListener('mouseleave', () => {
+        submenuTl.reverse().then(() => {
+            submenu.style.display = 'none';
+        });
+    });
+});// script.js
+
+// 햄버거 메뉴 토글
+const hamburger = document.getElementById('hamburger');
+const navMenu = document.querySelector('.nav-menu');
+const submenu = document.querySelector('.submenu');
+
+hamburger.addEventListener('click', () => {
+    navMenu.classList.toggle('active');
+    submenu.classList.toggle('active');
+});
+
+// GSAP 애니메이션 (데스크톱 호버)
+document.addEventListener('DOMContentLoaded', () => {
+    const submenuTl = gsap.timeline({ paused: true });
+    submenuTl.fromTo(submenu, { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" });
+
+    nav.addEventListener('mouseenter', () => {
+        submenu.style.display = 'block';
+        submenuTl.play();
+    });
+
+    nav.addEventListener('mouseleave', () => {
+        submenuTl.reverse().then(() => {
+            submenu.style.display = 'none';
+        });
+    });
+});
