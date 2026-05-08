@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Infinite Horizontal Slider</title>
+    <style>
+        :root {
+            --primary-color: #deff9a;
+            --bg-color: #0a0a0a;
+            --slide-speed: 0.5s;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #111;
+            font-family: 'Urbanist', sans-serif;
+        }
+
+        /* 슬라이더 메인 컨테이너 */
+        .slider-wrapper {
+            position: relative;
+            width: 90%;
+            max-width: 1000px;
+            height: 500px;
+            overflow: hidden;
+            border-radius: 24px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+            background-color: var(--bg-color);
+        }
+
+        /* 슬라이드들이 담긴 트랙 */
+        .slider-track {
+            display: flex;
+            height: 100%;
+            transition: transform var(--slide-speed) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            font-size: 4rem;
+            font-weight: 700;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        /* 슬라이드 오버레이 (텍스트 가독성) */
+        .slide::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+        }
+        .slide span { position: relative; z-index: 2; }
+
+        /* 네비게이션 버튼 (좌우 사이드 배치) */
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--primary-color);
+            color: #000;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 20px var(--primary-color);
+        }
+
+        .prev-btn { left: 20px; }
+        .next-btn { right: 20px; }
+
+        /* 페이지네이션 도트 */
+        .pagination {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 10;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background: var(--primary-color);
+            transform: scale(1.4);
+            box-shadow: 0 0 10px var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+
+<div class="slider-wrapper">
+    <button class="nav-btn prev-btn">❮</button>
+    <button class="nav-btn next-btn">❯</button>
+
+    <div class="slider-track" id="sliderTrack">
+        <div class="slide" style="background-image: url('https://picsum.photos/id/10/1200/600')"><span>SLIDE 01</span></div>
+        <div class="slide" style="background-image: url('https://picsum.photos/id/20/1200/600')"><span>SLIDE 02</span></div>
+        <div class="slide" style="background-image: url('https://picsum.photos/id/30/1200/600')"><span>SLIDE 03</span></div>
+        <div class="slide" style="background-image: url('https://picsum.photos/id/40/1200/600')"><span>SLIDE 04</span></div>
+    </div>
+
+    <div class="pagination" id="pagination"></div>
+</div>
+
+<script>
+    const track = document.getElementById('sliderTrack');
+    const originalSlides = Array.from(track.children);
+    const prevBtn = document.querySelector('.prev-btn');
+    const nextBtn = document.querySelector('.next-btn');
+    const paginationContainer = document.getElementById('pagination');
+
+    let currentIndex = 1; // 클론 때문에 1부터 시작
+    const slideCount = originalSlides.length;
+    let isMoving = false;
+
+    // 1. 무한 루프를 위한 클론 생성
+    const firstClone = originalSlides[0].cloneNode(true);
+    const lastClone = originalSlides[slideCount - 1].cloneNode(true);
+
+    track.appendChild(firstClone);
+    track.insertBefore(lastClone, originalSlides[0]);
+
+    // 2. 초기 위치 설정 (클론된 마지막 슬라이드 뒤인 실제 첫 슬라이드로)
+    track.style.transform = `translateX(-100%)`;
+
+    // 3. 동적 페이지네이션 생성
+    originalSlides.forEach((_, i) => {
+        const dot = document.createElement('div');
+        dot.classList.add('dot');
+        if (i === 0) dot.classList.add('active');
+        dot.addEventListener('click', () => {
+            if (isMoving) return;
+            currentIndex = i + 1;
+            moveSlider();
+        });
+        paginationContainer.appendChild(dot);
+    });
+
+    const dots = document.querySelectorAll('.dot');
+
+    function moveSlider() {
+        isMoving = true;
+        track.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+        track.style.transform = `translateX(-${currentIndex * 100}%)`;
+        updateDots();
+    }
+
+    function updateDots() {
+        dots.forEach(d => d.classList.remove('active'));
+        let activeIndex = currentIndex - 1;
+        if (currentIndex > slideCount) activeIndex = 0;
+        else if (currentIndex < 1) activeIndex = slideCount - 1;
+        dots[activeIndex].classList.add('active');
+    }
+
+    // 다음 슬라이드
+    nextBtn.addEventListener('click', () => {
+        if (isMoving) return;
+        currentIndex++;
+        moveSlider();
+    });
+
+    // 이전 슬라이드
+    prevBtn.addEventListener('click', () => {
+        if (isMoving) return;
+        currentIndex--;
+        moveSlider();
+    });
+
+    // 4. 무한 루프 핵심: 트랜지션 종료 후 위치 보정
+    track.addEventListener('transitionend', () => {
+        isMoving = false;
+        if (currentIndex > slideCount) {
+            track.style.transition = 'none';
+            currentIndex = 1;
+            track.style.transform = `translateX(-100%)`;
+        } else if (currentIndex < 1) {
+            track.style.transition = 'none';
+            currentIndex = slideCount;
+            track.style.transform = `translateX(-${slideCount * 100}%)`;
+        }
+    });
+</script>
+
+</body>
+</html>
+
+원하시는 사양에 맞춰 수평 이동 방식의 무한 슬라이더를 제작해 드렸습니다. 추가적으로 수정이 필요한 부분이 있다면 언제든지 말씀해 주세요!

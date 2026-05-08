@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GSAP Interactive Tab Menu</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --bg: #0f172a;
+            --tab-base: #1e293b;
+            --text-active: #ffffff;
+            --text-dim: #94a3b8;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Pretendard', sans-serif;
+        }
+
+        .tab-wrapper {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        /* 탭 리스트 - 배경 역할 */
+        .tab-list {
+            position: relative;
+            display: flex;
+            background: var(--tab-base);
+            padding: 8px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 따라다니는 배경 (Indicator) */
+        .tab-indicator {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            height: calc(100% - 16px);
+            background: var(--primary);
+            border-radius: 12px;
+            z-index: 0;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+            /* 초기 너비는 JS에서 계산 */
+        }
+
+        .tab-btn {
+            flex: 1;
+            position: relative;
+            z-index: 1; /* 인디케이터보다 위에 위치 */
+            border: none;
+            background: none;
+            padding: 14px 0;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-dim);
+            transition: color 0.3s ease;
+            outline: none;
+        }
+
+        .tab-btn.active {
+            color: var(--text-active);
+        }
+
+        /* 접근성 포커스 스타일 */
+        .tab-btn:focus-visible {
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+        }
+
+        /* 콘텐츠 스타일 */
+        .tab-panel {
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 20px;
+            min-height: 120px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-panel h2 { margin-top: 0; color: var(--primary); }
+        .tab-panel p { line-height: 1.6; color: #cbd5e1; }
+        
+        [hidden] { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="tab-wrapper">
+    <!-- 탭 메뉴 영역 -->
+    <div class="tab-list" role="tablist">
+        <!-- 움직이는 배경 요소 -->
+        <div class="tab-indicator"></div>
+        
+        <button role="tab" aria-selected="true" aria-controls="p1" id="t1" class="tab-btn active">브랜드</button>
+        <button role="tab" aria-selected="false" aria-controls="p2" id="t2" class="tab-btn" tabindex="-1">서비스</button>
+        <button role="tab" aria-selected="false" aria-controls="p3" id="t3" class="tab-btn" tabindex="-1">포트폴리오</button>
+        <button role="tab" aria-selected="false" aria-controls="p4" id="t4" class="tab-btn" tabindex="-1">문의하기</button>
+    </div>
+
+    <!-- 콘텐츠 영역 -->
+    <div class="tab-content">
+        <div id="p1" role="tabpanel" aria-labelledby="t1" class="tab-panel">
+            <h2>Brand Story</h2>
+            <p>우리는 혁신적인 디자인과 기술을 결합하여 새로운 디지털 경험을 창조합니다.</p>
+        </div>
+        <div id="p2" role="tabpanel" aria-labelledby="t2" class="tab-panel" hidden>
+            <h2>Our Service</h2>
+            <p>웹 표준 준수, UI/UX 디자인, 그리고 최적화된 퍼포먼스를 제공합니다.</p>
+        </div>
+        <div id="p3" role="tabpanel" aria-labelledby="t3" class="tab-panel" hidden>
+            <h2>Portfolio</h2>
+            <p>수많은 기업들과 함께 성공적인 프로젝트를 완수해 왔습니다.</p>
+        </div>
+        <div id="p4" role="tabpanel" aria-labelledby="t4" class="tab-panel" hidden>
+            <h2>Contact Us</h2>
+            <p>당신의 아이디어를 실현할 준비가 되었습니다. 지금 바로 연락주세요.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const tabs = document.querySelectorAll('.tab-btn');
+    const panels = document.querySelectorAll('.tab-panel');
+    const indicator = document.querySelector('.tab-indicator');
+
+    function moveIndicator(target) {
+        // 부모(tab-list) 기준으로 버튼의 위치와 너비를 계산하여 배경을 이동시킴
+        gsap.to(indicator, {
+            x: target.offsetLeft - 8, // padding 값 보정
+            width: target.offsetWidth,
+            duration: 0.5,
+            ease: "back.out(1.5)" // 살짝 넘쳤다 돌아오는 쫀득한 느낌
+        });
+    }
+
+    function switchTab(index, shouldFocus = true) {
+        const activeTab = tabs[index];
+
+        // 1. 상태 업데이트
+        tabs.forEach((tab, i) => {
+            const isActive = i === index;
+            tab.classList.toggle('active', isActive);
+            tab.setAttribute('aria-selected', isActive);
+            tab.setAttribute('tabindex', isActive ? '0' : '-1');
+            panels[i].hidden = !isActive;
+        });
+
+        // 2. 배경 이동 애니메이션
+        moveIndicator(activeTab);
+
+        // 3. 콘텐츠 등장 애니메이션
+        gsap.fromTo(panels[index], 
+            { opacity: 0, y: 15 }, 
+            { opacity: 1, y: 0, duration: 0.4 }
+        );
+
+        if (shouldFocus) activeTab.focus();
+    }
+
+    // 초기 위치 설정
+    window.onload = () => {
+        moveIndicator(tabs[0]);
+    };
+
+    // 클릭 이벤트 핸들러
+    tabs.forEach((tab, idx) => {
+        tab.addEventListener('click', () => switchTab(idx));
+    });
+
+    // 키보드 접근성 핸들러
+    document.querySelector('.tab-list').addEventListener('keydown', (e) => {
+        let currentIdx = Array.from(tabs).indexOf(document.activeElement);
+        
+        if (e.key === 'ArrowRight') {
+            switchTab((currentIdx + 1) % tabs.length);
+        } else if (e.key === 'ArrowLeft') {
+            switchTab((currentIdx - 1 + tabs.length) % tabs.length);
+        }
+    });
+
+    // 윈도우 리사이즈 시 배경 위치 재조정
+    window.addEventListener('resize', () => {
+        const activeTab = document.querySelector('.tab-btn.active');
+        moveIndicator(activeTab);
+    });
+</script>
+
+</body>
+</html>

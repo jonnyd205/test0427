@@ -20,7 +20,70 @@
             <div class="hamburger" id="hamburger">
                 <span></span>
                 <span></span>
-                <span></span>
+                <span></span<ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#">메뉴1</a>
+                    <ul class="submenu">
+                        <li><a href="#">메뉴1 서브1</a></li>
+                        <li><a href="#">메뉴1 서브2</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="#">메뉴2</a>
+                    <ul class="submenu">
+                        <li><a href="#">메뉴2 서브1</a></li>
+                        <li><a href="#">메뉴2 서브2</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="#">메뉴3</a>
+                    <ul class="submenu">
+                        <li><a href="#">메뉴3 서브1</a></li>
+                        <li><a href="#">메뉴3 서브2</a></li>
+                    </ul>
+                </li>
+            </ul>/* 서브메뉴 */
+.submenu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    z-index: 1000;
+    padding: 0;
+    margin: 0;
+}
+
+.submenu li {
+    padding: 10px 20px;
+}
+
+.submenu li a {
+    color: #ccc;
+    text-decoration: none;
+    display: block;
+}
+
+.submenu li a:hover {
+    color: white;
+}
+
+/* 1 차 메뉴 호버 시 해당 서브메뉴 표시 */
+.nav-item:hover .submenu {
+    display: block;
+}
+
+/* 메뉴 간격 */
+.nav-item {
+    position: relative;
+    margin-right: 10px;
+}
+
+/* 서브메뉴 컨테이너 제거 */
+.submenu-container {
+    display: none; /* 전체 컨테이너 제거 */
+}
             </div>
         </div>
         <div class="submenu">

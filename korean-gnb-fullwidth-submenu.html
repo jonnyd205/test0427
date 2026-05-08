@@ -1,0 +1,367 @@
+<!--
+@reference
+name: Korean GNB Navigation
+globs: ["**/*.html", "**/*.css", "**/*.js"]
+alwaysApply: true
+
+이 파일은 한국형 Full-Width Submenu GNB 패턴의 원본입니다.
+구조, 클래스명, JS 이벤트 패턴 전부 이 파일을 기준으로 작업하세요.
+-->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Publisher - Trendy Premium GNB (Fixed Hover & A11y)</title>
+<style>
+	/* [1. CSS VARIABLES] */
+	:root {
+		--primary: #4f46e5;
+		--text-main: #0f172a;
+		--text-sub: #475569;
+		--bg-white: rgba(255, 255, 255, 1);
+		--bg-sub-panel: #ffffff;
+		--border-light: rgba(226, 232, 240, 0.6);
+		--nav-h: 72px;
+		--nav-container-max: 1200px;
+		--z-header: 1000;
+		--z-sub-menu: 1002;
+		--z-panel: 900;
+		--z-mobile-nav: 2000;
+		--hover-bg: #f1f5f9; 
+		--dynamic-panel-h: 0px;
+		/* 숫자가 낮을수록 얇고, 높을수록 두껍습니다 */
+		--fw-100: 100; /* Thin: 아주 가는 서체 (장식용) */
+		--fw-300: 300; /* Light: 본문보다 가벼운 느낌 */
+		--fw-400: 400; /* Regular: 기본 본문용 (가장 많이 씀) */
+		--fw-700: 700; /* Bold: 강조 및 소제목 */
+		--fw-900: 900; /* Black: 아주 두꺼운 메인 타이틀 */
+	}
+
+	/* [2. BASE RESET] */
+	* { margin: 0; padding: 0; box-sizing: border-box; }
+	body { font-family: 'Pretendard', sans-serif; color: var(--text-main); background: #f8fafc; }
+	a { text-decoration: none; color: inherit; display: block; }
+	ul { list-style: none; }
+	button { border: none; background: none; cursor: pointer; }
+
+	/* [3. HEADER STRUCTURE] */
+	.gnb-header {
+		position: fixed;
+		top: 0; left: 0;
+		width: 100%;
+		background: var(--bg-white);
+		border-bottom: 1px solid var(--border-light);
+		z-index: var(--z-header);
+	}
+
+	/* 판넬 하단 브릿지 영역 (마우스 이탈 방지용 가상 영역) */
+	.gnb-header::before {
+		content: '';
+		position: absolute;
+		top: 100%; left: 0; width: 100%;
+		height: var(--dynamic-panel-h);
+		background: transparent;
+		z-index: -1;
+	}
+
+	.nav-container {
+		max-width: var(--nav-container-max);
+		margin: 0 auto;
+		padding: 0 24px;
+		display: flex;
+		justify-content: space-between;
+		height: var(--nav-h);
+	}
+
+	.logo { 
+		font-size: 1.25rem; 
+		font-weight: 800; 
+		color: var(--primary); 
+		display: flex;
+		align-items: center;
+	}
+	
+	/* [PC NAVIGATION - 포인트 바 애니메이션] */
+	@media (min-width: 1025px) {
+		.depth1 {
+			position: relative; /* 바(bar)의 기준점 */
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			height: 100%;
+			font-weight: 600;
+			padding: 0 20px;
+			transition: color 0.3s;
+		}
+
+		/* 1차 메뉴 하단 포인트 바 디자인 */
+		.depth1::before {
+			content: '';
+			position: absolute;
+			bottom: 15px; /* 바의 수직 위치 (취향에 따라 조절) */
+			left: 50%;
+			transform: translateX(-50%) scaleX(0); /* 처음엔 크기 0 */
+			width: 40px; /* 바의 가로 길이 */
+			height: 3px; /* 바의 두께 */
+			background-color: var(--primary);
+			border-radius: 2px;
+			transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+			z-index: 10;
+		}
+
+		/* 1차 메뉴에 호버하거나, 키보드로 포커스 되었을 때 바가 나타남 */
+		.menu-item:hover .depth1::before,
+		.menu-item:focus-within .depth1::before {
+			transform: translateX(-50%) scaleX(1); /* 크기 1로 확장 */
+		}
+
+		/* 1차 메뉴 텍스트 색상 변경 */
+		.menu-item:hover .depth1,
+		.menu-item:focus-within .depth1 {
+			color: var(--primary);
+		}
+}
+	/* [4. PC NAVIGATION] */
+	@media (min-width: 1025px) {
+		.m-only { display: none; }
+		.main-menu { display: flex; height: 100%; }
+
+		.menu-item {
+			position: relative;
+			height: 100%;
+			min-width: 130px;
+			z-index: var(--z-sub-menu); 
+		}
+
+		/* 1차 메뉴 롤오버/포커스 시 배경색 (메뉴 영역 한정) */
+		.menu-item:hover::after,
+		.menu-item:focus-within::after {
+			content: '';
+			position: absolute;
+			top: 0; left: 0; width: 100%;
+			height: calc(var(--nav-h) + var(--dynamic-panel-h)); 
+			background-color: var(--hover-bg);
+			z-index: -1; 
+			pointer-events: none;
+		}
+
+		.depth1 {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			height: 100%;
+			font-weight: 600;
+			padding: 0 20px;
+			transition: color 0.2s;
+		}
+
+		.menu-item:hover .depth1,
+		.menu-item:focus-within .depth1 { color: var(--primary); }
+
+		.sub-menu {
+			display: none; 
+			position: absolute;
+			top: var(--nav-h);
+			left: 0;
+			width: 100%;
+			padding: 20px 0 30px; 
+			text-align: center;
+		}
+
+		/* 판넬 활성화 상태일 때만 서브메뉴 노출 */
+		.gnb-header.is-active .sub-menu { display: block; }
+
+		.sub-menu li a {
+			padding: 10px 12px;
+			font-size: 0.9rem;
+			color: var(--text-sub);
+			border-radius: 8px;
+			margin: 0 10px;
+			transition: 0.2s;
+		}
+		.sub-menu li a:hover,
+		.sub-menu li a:focus { 
+			background: var(--primary); 
+			color: #fff; 
+			outline: none;
+		}
+
+		.sub-bg-panel {
+			position: absolute;
+			top: var(--nav-h);
+			left: 0;
+			width: 100%;
+			height: 0;
+			background: var(--bg-sub-panel);
+			box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+			border-bottom: 0px solid var(--border-light);
+			transition: height 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+			z-index: var(--z-panel);
+			pointer-events: none;
+		}
+		.gnb-header.is-active .sub-bg-panel { border-bottom-width: 1px; }
+	}
+
+	/* [5. MOBILE NAVIGATION] (생략 없이 유지) */
+	@media (max-width: 1024px) {
+		.pc-only { display: none; }
+		.m-menu-btn { font-size: 28px; }
+		.nav-wrapper {
+			position: fixed; top: 0; right: -100%;
+			width: 80%; max-width: 320px; height: 100vh;
+			background: var(--bg-white); transition: right 0.4s;
+			padding-top: 80px; z-index: var(--z-mobile-nav); overflow-y: auto;
+		}
+		.nav-wrapper.is-open { right: 0; }
+		.m-close-btn { position: absolute; top: 24px; right: 24px; font-size: 28px; }
+		.depth1 { padding: 20px 30px; font-weight: 700; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; }
+		.depth1::after { content: '＋'; transition: 0.3s; }
+		.menu-item.active .depth1::after { content: '－'; transform: rotate(180deg); color: var(--primary); }
+		.sub-menu { max-height: 0; overflow: hidden; background: #f8fafc; transition: max-height 0.4s, opacity 0.3s; opacity: 0; }
+		.sub-menu.is-visible { max-height: 1000px; opacity: 1; }
+		.sub-menu li a { padding: 14px 40px; color: var(--text-sub); }
+	}
+
+	.main-hero { margin-top: var(--nav-h); padding: 160px 24px; text-align: center; }
+</style>
+</head>
+<body>
+
+<header class="gnb-header">
+    <div class="nav-container">
+        <h1 class="logo"><a href="#">AI_PUBLISHER.</a></h1>
+        
+        <button type="button" class="m-menu-btn m-only">☰</button>
+        
+        <nav class="nav-wrapper">
+            <button type="button" class="m-close-btn m-only">✕</button>
+            <ul class="main-menu">
+                <li class="menu-item">
+                    <a href="#" class="depth1">PRODUCT</a>
+                    <ul class="sub-menu">
+                        <li><a href="#">Core Engine</a></li>
+                        <li><a href="#">Analysis Kit</a></li>
+                        <li><a href="#">Connect API</a></li>
+                    </ul>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="depth1">COMPANY</a>
+                    <ul class="sub-menu">
+                        <li><a href="#">Identity</a></li>
+                        <li><a href="#">Team</a></li>
+                        <li><a href="#">Careers</a></li>
+                    </ul>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="depth1">RESOURCES</a>
+                    <ul class="sub-menu">
+                        <li><a href="#">Docs</a></li>
+                        <li><a href="#">Changelog</a></li>
+                        <li><a href="#">Premium Support</a></li>
+                        <li><a href="#">Tutorials</a></li>
+                        <li><a href="#">Case Studies</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+        <div class="sub-bg-panel pc-only"></div>
+    </div>
+</header>
+
+<main class="main-hero">
+    <h2>Logo Hover Ignored.</h2>
+    <p>로고가 아닌 1차 메뉴에 롤오버할 때만 서브메뉴가 활성화됩니다.</p>
+    <p>Tab 키를 사용하여 접근성을 테스트해보세요.</p>
+</main>
+
+<script>
+    const header = document.querySelector('.gnb-header');
+    const mainMenu = document.querySelector('.main-menu');
+    const subBgPanel = document.querySelector('.sub-bg-panel');
+    const navWrapper = document.querySelector('.nav-wrapper');
+    const mMenuBtn = document.querySelector('.m-menu-btn');
+    const mCloseBtn = document.querySelector('.m-close-btn');
+    const depth1Links = document.querySelectorAll('.depth1');
+
+    // [기능] 서브메뉴 판넬 열기
+    const openPanel = () => {
+        if (window.innerWidth > 1024) {
+            const subMenus = document.querySelectorAll('.sub-menu');
+            let maxHeight = 0;
+            
+            // 모든 서브메뉴 중 가장 높은 높이 계산
+            subMenus.forEach(menu => {
+                menu.style.display = 'block';
+                const h = menu.offsetHeight;
+                if (h > maxHeight) maxHeight = h;
+                menu.style.display = ''; 
+            });
+
+            header.classList.add('is-active');
+            subBgPanel.style.height = maxHeight + 'px';
+            document.documentElement.style.setProperty('--dynamic-panel-h', maxHeight + 'px');
+        }
+    };
+
+    // [기능] 서브메뉴 판넬 닫기
+    const closePanel = () => {
+        header.classList.remove('is-active');
+        subBgPanel.style.height = '0';
+        document.documentElement.style.setProperty('--dynamic-panel-h', '0px');
+    };
+
+    /* --- PC: 마우스 및 키보드 이벤트 --- */
+
+    /* 마우스가 메인 메뉴 영역에 들어올 때만 전체 판넬 열림 */
+	mainMenu.addEventListener('mouseenter', openPanel);
+
+	/* 마우스가 헤더(로고+메뉴+판넬 포함)를 완전히 벗어날 때 닫힘 */
+	header.addEventListener('mouseleave', closePanel);
+
+	/* 키보드 탭으로 메뉴 진입 시 열림 */
+	mainMenu.addEventListener('focusin', openPanel);
+
+	/* 키보드 탭이 헤더를 완전히 빠져나갈 때 닫힘 */
+	header.addEventListener('focusout', (e) => {
+		if (!header.contains(e.relatedTarget)) {
+			closePanel();
+		}
+	});
+
+    /* --- MOBILE: 로직 (기존 유지) --- */
+    const resetMobileMenus = () => {
+        document.querySelectorAll('.sub-menu').forEach(s => s.classList.remove('is-visible'));
+        document.querySelectorAll('.menu-item').forEach(li => li.classList.remove('active'));
+    };
+
+    mMenuBtn.addEventListener('click', () => { 
+        navWrapper.classList.add('is-open'); 
+        document.body.style.overflow = 'hidden'; 
+    });
+    
+    mCloseBtn.addEventListener('click', () => { 
+        navWrapper.classList.remove('is-open'); 
+        document.body.style.overflow = ''; 
+        resetMobileMenus(); 
+    });
+
+    depth1Links.forEach(link => {
+        link.addEventListener('click', (e) => {
+            if (window.innerWidth <= 1024) {
+                e.preventDefault();
+                const subMenu = link.nextElementSibling;
+                const parentLi = link.parentElement;
+                const isOpen = subMenu.classList.contains('is-visible');
+                resetMobileMenus();
+                if (!isOpen) { 
+                    subMenu.classList.add('is-visible'); 
+                    parentLi.classList.add('active'); 
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
